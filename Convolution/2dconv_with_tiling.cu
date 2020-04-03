@@ -13,8 +13,7 @@ void ref(void);
 __constant__ double Mc[KERNEL_SIZE*KERNEL_SIZE];
 void compare(int N, double *wref, double *w);
 
-__global__ void ConvolutionKernel(double* N, double* P, int inp_size)
-{
+__global__ void ConvolutionKernel(double* N, double* P, int inp_size){
     __shared__ float tileNs[TILE_SIZE][TILE_SIZE];
     // get thread indices
     int tx = threadIdx.x;
@@ -41,8 +40,7 @@ __global__ void ConvolutionKernel(double* N, double* P, int inp_size)
     if(tx < TILE_SIZE && ty < TILE_SIZE){
         float pValue = 0.0f;
         for(int y=0; y<KERNEL_SIZE; y++)
-            for(int x=0; x<KERNEL_SIZE; x++)
-	    {
+            for(int x=0; x<KERNEL_SIZE; x++){
                 pValue += Mc[y*KERNEL_SIZE + x] * tileNs[y+ty][x+tx];
 	    }
         // only write values if you are inside matrix bounds
@@ -94,8 +92,7 @@ int main(){
 	ConvolutionKernel<<< blkDim , grdDim >>>(Nd,Pd,n);
 	if (cudaDeviceSynchronize() != cudaSuccess)
                 printf ("Error return for test_kernel\n");
-	else
-	{
+	else{
 		clkend = rtclock();
 		t = clkend-clkbegin;
 		cudaMemcpy(c,Pd,size_input,cudaMemcpyDeviceToHost);
@@ -104,21 +101,18 @@ int main(){
 				n*n*m*m/t/1e9,t);
 		printf("Correctness Check for GPU solution:\n");
 		/*compare(n, (double *) c,(double *) cref);
-		for(i=0;i<m;i++)
-		{
+		for(i=0;i<m;i++){
 			for(j=0;j<m;j++)
 				printf("%2.0lf  ",b[i*m+j]);
 			printf("\n");
 		}
 		printf("\n\n");
-		for(i=0;i<n;i++)
-		{
+		for(i=0;i<n;i++){
 			for(j=0;j<n;j++)
 				printf("%2.0lf  ",a[i*n+j]);
 			printf("\n");
 		}
-		for(i=0;i<n;i++)
-		{
+		for(i=0;i<n;i++){
 			for(j=0;j<n;j++)
 				printf("%3.0lf  ",c[i*n+j]);
 			printf("\n");
@@ -130,12 +124,10 @@ int main(){
 	}
 }
 
-void ref(void)
-{
+void ref(void){
 	int i,j,k,l,x,y;
 	for(i=0;i<n;i++)
-		for(j=0;j<n;j++)
-		{
+		for(j=0;j<n;j++){
 			k = i-m/2;
 			l = j-m/2;
 			for(x=0;x<m;x++)
@@ -146,8 +138,7 @@ void ref(void)
 		}
 }
 
-void init(void)
-{
+void init(void){
 	int i,j;
 	for(i=0;i<n;i++)
 		for(j=0;j<n;j++)
@@ -158,8 +149,7 @@ void init(void)
 			b[i*m+j] = i+j;
 }
 
-void compare(int N, double *wref, double *w)
-{
+void compare(int N, double *wref, double *w){
 	double maxdiff,this_diff;
 	int numdiffs;
 	int i;
@@ -184,8 +174,7 @@ void compare(int N, double *wref, double *w)
 		printf("No differences found between reference and test versions\n");
 }
 
-double rtclock(void)
-{
+double rtclock(void){
 	struct timezone Tzp;
 	struct timeval Tp;
 	int stat;
@@ -195,8 +184,7 @@ double rtclock(void)
 }
 
 /*
-__global__ void test_kernel(int N, double *A, double *B, double *C)
-{
+__global__ void test_kernel(int N, double *A, double *B, double *C){
 	//int x=threadIdx.y+blockIdx.y*blockDim.y;
 	//int y=threadIdx.x+blockIdx.x*blockDim.x;
 	double sum;
@@ -211,8 +199,7 @@ __global__ void test_kernel(int N, double *A, double *B, double *C)
 	int row = by*TILE_WIDTH + ty;
 	int col = bx*TILE_WIDTH + tx;
 
-	for(int m=0; m<N/TILE_WIDTH; ++m)
-	{
+	for(int m=0; m<N/TILE_WIDTH; ++m){
 		if(row < N && (m*TILE_WIDTH +tx) < N)	
 			Ads[ty][tx] = A[row*N + TILE_WIDTH*m + tx];
 		else
@@ -232,8 +219,7 @@ __global__ void test_kernel(int N, double *A, double *B, double *C)
 		C[row*N + col] = sum;
 /*
 	if((x<N)&&(y<N))
-		for (int k=0;k<N;k+=4)
-		{
+		for (int k=0;k<N;k+=4){
 			sum += A[x*N+k]*B[y*N+k];
 			sum += A[x*N+k+1]*B[y*N+k+1];
 			sum += A[x*N+k+2]*B[y*N+k+2];
